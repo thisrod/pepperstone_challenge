@@ -45,6 +45,8 @@ class TestFailures(unittest.TestCase):
 
     def test_repeat(self):
         self.assertFails(run_with(["foo", "bar", "foo"], []), b'Repeated word:')
+        # Repeated word that normalises to something else
+        self.assertFails(run_with(["acbd", "bar", "acbd"], []), b'Repeated word:')
 
 class TestCounts(unittest.TestCase):
 

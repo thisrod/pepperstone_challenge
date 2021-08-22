@@ -43,7 +43,8 @@ for t in dictionary:
     elif not s.isalpha():
         fail("Word contains non-letter:", s)
     else:
-        words.append(normalise(s))
+        words.append(s)
+words = [normalise(s) for s in words]
 if sum(map(len, words)) > 105:
     fail("Total of word lengths exceeds 105")
 for (n, s) in enumerate(strings):
