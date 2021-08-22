@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+
+import sys
+
+def fail(*args):
+    print(*args, file=sys.stderr)
+    sys.exit(1)
+
+if not (len(sys.argv) == 5 and sys.argv[1] == "--dictionary" and sys.argv[3] == "--input"):
+    fail("Usage:", sys.argv[0], "--dictionary <dictionary file> --input <input file>")
+
+try:
+    dictionary = open(sys.argv[2])
+except OSError as E:
+    fail("Could not open dictionary file:", E)
+
+try:
+    strings = open(sys.argv[4])
+except OSError as E:
+    fail("Could not open input file:", E)
+
+# Normalise scrambled words by sorting their middle characters.
+# The scrambled words match iff the normalised strings compare equal.
+
+def normalise(s):
+    s = list(s)
+    t = s[1:-1]
+    t.sort()
+    return "".join(s[:1] + t + s[-1:])
+
+# word is already normalised
+def occursin(word, line):
+    words = [line[j:j+len(word)] for j in range(len(line)-len(word)+1)]
+    return any([word == normalise(s) for s in words])
+
+words = []
+for t in dictionary:
+    s = t.rstrip("\n")
+    if s in words:
+        fail("Repeated word:", s)
+    elif not 2 <= len(s) <= 105:
+        fail("Word length not supported:", s)
+    elif not s.isalpha():
+        fail("Word contains non-letter:", s)
+    else:
+        words.append(normalise(s))
+if sum(map(len, words)) > 105:
+    fail("Total of word lengths exceeds 105")
+for (n, s) in enumerate(strings):
+    print("Case #%d: %d" % (n+1, [occursin(w, s) for w in words].count(True)))
