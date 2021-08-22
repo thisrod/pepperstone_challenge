@@ -15,7 +15,7 @@ except OSError as E:
     fail("Could not open dictionary file:", E)
 
 try:
-    strings = open(sys.argv[4])
+    input = open(sys.argv[4])
 except OSError as E:
     fail("Could not open input file:", E)
 
@@ -24,24 +24,30 @@ def normalise(s):
     s = list(s)
     return s[:1] + sorted(s[1:-1]) + s[-1:]
 
-# word is already normalised
+# word is already normalised.  Compare it to each same-length substring of line
 def occursin(word, line):
-    words = [line[j:j+len(word)] for j in range(len(line)-len(word)+1)]
-    return any([word == normalise(s) for s in words])
+    substrings = [line[j:j+len(word)] for j in range(len(line)-len(word)+1)]
+    return any([word == normalise(s) for s in substrings])
 
-words = []
-for t in dictionary:
-    s = t.rstrip("\n")
-    if s in words:
-        fail("Repeated word:", s)
-    elif not 2 <= len(s) <= 105:
-        fail("Word length not supported:", s)
-    elif not s.isalpha():
-        fail("Word contains non-letter:", s)
+def valid(word):
+    if word in words:
+        fail("Repeated word:", word)
+    elif not 2 <= len(word) <= 105:
+        fail("Word length not supported:", word)
+    elif not word.isalpha():
+        fail("Word contains non-letter:", word)
     else:
-        words.append(s)
+        return word
+
+# List the original words, checking for repeats, then normalise
+words = []
+for s in dictionary:
+    words.append(valid(s.rstrip("\n")))
 words = [normalise(s) for s in words]
+
 if sum(map(len, words)) > 105:
     fail("Total of word lengths exceeds 105")
-for (n, s) in enumerate(strings):
-    print("Case #%d: %d" % (n+1, [occursin(w, s) for w in words].count(True)))
+
+for (n, line) in enumerate(input, start=1):
+    matches = [occursin(w, line) for w in words]
+    print("Case #%d: %d" % (n, matches.count(True)))
