@@ -20,13 +20,9 @@ except OSError as E:
     fail("Could not open input file:", E)
 
 # Normalise scrambled words by sorting their middle characters.
-# The scrambled words match iff the normalised strings compare equal.
-
 def normalise(s):
     s = list(s)
-    t = s[1:-1]
-    t.sort()
-    return "".join(s[:1] + t + s[-1:])
+    return s[:1] + sorted(s[1:-1]) + s[-1:]
 
 # word is already normalised
 def occursin(word, line):
